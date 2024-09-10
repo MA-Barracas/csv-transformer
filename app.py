@@ -99,7 +99,7 @@ if uploaded_file is not None:
     
 
     # Process the uploaded file
-    st.subheader("Step 3: Process the File")
+    st.subheader("Step 5: Process the File")
     if st.button("Process CSV", help="Click to process the CSV file"):
         processed_df = process_csv(original_df, apply_rename, apply_ratio)
         st.success("CSV file processed successfully!")
