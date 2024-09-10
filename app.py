@@ -55,15 +55,29 @@ st.markdown("""
 st.subheader("Step 1: Upload Your CSV File")
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"], help="Make sure your CSV has at least two columns.")
 
+separator = st.sidebar.selectbox(
+            "Choose the separator used in your CSV file:",
+            options=["comma", "semi-colon", "pipe", "whitespace"],
+            index=0,
+            help="Select the character that separates columns in your CSV file."
+        )
+
+sep_map = {"comma": ",", "semi-colon": ";","pipe": "|","whitespace": " "}
+separator = sep_map[separator]
+
 if uploaded_file is not None:
     st.success("CSV file uploaded successfully!")
     
     # Display the uploaded file
     st.subheader("Step 2: Preview Uploaded File")
     st.write("Here's a preview of your uploaded file:")
-    original_df = pd.read_csv(uploaded_file)
+
+    
+
+    original_df = pd.read_csv(uploaded_file, sep=separator)
     st.dataframe(original_df)
     
+
     # Process the uploaded file
     st.subheader("Step 3: Process the File")
     if st.button("Process CSV", help="Click to process the CSV file"):
