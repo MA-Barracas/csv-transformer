@@ -14,13 +14,16 @@ def create_ratio_column(df, col1, col2):
     return df
 
 # Function to process the CSV file
-def process_csv(df):
+def process_csv(df, apply_rename, apply_ratio):
       
-    # Rename columns
-    df = rename_columns(df)
-    
-    # Create a new ratio column
-    df = create_ratio_column(df, 'Renamed_Column1', 'Renamed_Column2')
+        # Apply selected processing functions
+    if apply_rename:
+        df = rename_columns(df)
+    if apply_ratio:
+        if 'Renamed_Column1' in df.columns and 'Renamed_Column2' in df.columns:
+            df = create_ratio_column(df, 'Renamed_Column1', 'Renamed_Column2')
+        else:
+            st.warning("Cannot create Ratio Column: Ensure that 'Renamed_Column1' and 'Renamed_Column2' exist.")
     
     return df
 
@@ -52,9 +55,10 @@ st.markdown("""
     """)
 
 # File uploader
-st.subheader("Step 1: Upload Your CSV File")
+st.subheader("Step 2: Upload Your CSV File")
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"], help="Make sure your CSV has at least two columns.")
 
+st.sidebar.subheader("Step 1: Select the CSV Separator")
 separator = st.sidebar.selectbox(
             "Choose the separator used in your CSV file:",
             options=["comma", "semi-colon", "pipe", "whitespace"],
@@ -69,19 +73,35 @@ if uploaded_file is not None:
     st.success("CSV file uploaded successfully!")
     
     # Display the uploaded file
-    st.subheader("Step 2: Preview Uploaded File")
+    st.subheader("Step 3: Preview Uploaded File")
     st.write("Here's a preview of your uploaded file:")
 
     
 
     original_df = pd.read_csv(uploaded_file, sep=separator)
     st.dataframe(original_df)
+
+    # Processing options
+    st.subheader("Step 4: Select Processing Options")
+    apply_rename = st.radio(
+        "Do you want to rename the columns?",
+        options=["Yes", "No"],
+        index=0,
+        help="Select 'Yes' to rename the columns in the CSV file."
+    ) == "Yes"
+    
+    apply_ratio = st.radio(
+        "Do you want to create a ratio column?",
+        options=["Yes", "No"],
+        index=0,
+        help="Select 'Yes' to create a new column with the ratio of two existing columns."
+    ) == "Yes"
     
 
     # Process the uploaded file
     st.subheader("Step 3: Process the File")
     if st.button("Process CSV", help="Click to process the CSV file"):
-        processed_df = process_csv(original_df)
+        processed_df = process_csv(original_df, apply_rename, apply_ratio)
         st.success("CSV file processed successfully!")
         
         # Display the processed DataFrame
